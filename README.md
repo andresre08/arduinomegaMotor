@@ -1,4 +1,116 @@
-# Arduino Mega - Sistema de Interrupciones
+# Arduino Mega Motor BLDC Control System
+
+## Descripción del Proyecto
+
+Sistema avanzado de control para motor BLDC (Brushless DC) utilizando Arduino Mega 2560 y driver IR2136. Este proyecto implementa un control de 6 pasos con interrupciones externas para el manejo preciso de motores trifásicos sin escobillas.
+
+## Características Principales
+
+### 🔧 Hardware
+- **Microcontrolador**: Arduino Mega 2560
+- **Driver de Motor**: IR2136 (Three Phase Bridge Driver)
+- **Motor**: BLDC trifásico de 6 pasos
+- **Control PWM**: Intensidad variable por ADC
+- **Interrupciones**: 3 entradas digitales con detección de flancos
+
+### ⚡ Funcionalidades
+- **Control de 6 pasos**: Secuencia binaria optimizada (1,3,7,6,4,0)
+- **Interrupciones unificadas**: Pines 2 (INT0), 3 (INT1), 18 (INT5)
+- **PWM dinámico**: Control de intensidad vía ADC A0
+- **Sistema híbrido**: Salidas altas PWM + salidas bajas digitales
+- **Configuración IR2136**: Pines HIN1-3 (PWM) y LIN1-3 (Digital)
+
+## Configuración de Hardware
+
+### Conexiones Arduino Mega → IR2136
+```
+Pin 4 (HIN1) → IR2136 HIN1 (Fase A Alta)
+Pin 5 (HIN2) → IR2136 HIN2 (Fase B Alta) 
+Pin 6 (HIN3) → IR2136 HIN3 (Fase C Alta)
+Pin 7 (LIN1) → IR2136 LIN1 (Fase A Baja)
+Pin 8 (LIN2) → IR2136 LIN2 (Fase B Baja)
+Pin 9 (LIN3) → IR2136 LIN3 (Fase C Baja)
+Pin 10     → IR2136 ENABLE
+Pin A0     → Potenciómetro (Control PWM)
+```
+
+### Entradas de Control
+```
+Pin 2  (INT0) → Sensor/Switch Entrada 1
+Pin 3  (INT1) → Sensor/Switch Entrada 2  
+Pin 18 (INT5) → Sensor/Switch Entrada 3
+```
+
+## Secuencia de Control BLDC
+
+El sistema utiliza una secuencia de 6 pasos optimizada para motores BLDC:
+
+| Paso | Binario | HIN1 | LIN1 | HIN2 | LIN2 | HIN3 | LIN3 | Estado Motor |
+|------|---------|------|------|------|------|------|------|--------------|
+| 1    | 001     | PWM  | OFF  | OFF  | ON   | OFF  | ON   | 000110       |
+| 2    | 011     | OFF  | OFF  | OFF  | ON   | PWM  | OFF  | 100100       |
+| 3    | 111     | OFF  | OFF  | PWM  | OFF  | OFF  | ON   | 100001       |
+| 4    | 110     | OFF  | OFF  | OFF  | OFF  | OFF  | ON   | 001001       |
+| 5    | 100     | OFF  | ON   | OFF  | OFF  | PWM  | OFF  | 011000       |
+| 6    | 000     | OFF  | ON   | PWM  | OFF  | OFF  | OFF  | 010010       |
+
+## Características Técnicas
+
+### Control PWM
+- **Frecuencia**: 976 Hz (configurable)
+- **Resolución**: 8 bits (0-255)
+- **Control**: ADC A0 (0-100%)
+- **Aplicación**: Solo salidas altas (HIN1, HIN2, HIN3)
+
+### Sistema de Interrupciones
+- **Tipo**: Detección de cambios (CHANGE)
+- **Procesamiento**: Función unificada `interrupcion_unificada()`
+- **Lógica**: Lectura binaria de 3 bits simultánea
+- **Debounce**: Implementado por software
+
+### Compatibilidad IR2136
+- **Alimentación**: 15V (Motor), 5V (Lógica)
+- **Dead Time**: Configurado en hardware
+- **Protecciones**: Sobrecorriente, sobrecalentamiento
+- **Bootstrap**: Capacitores externos requeridos
+
+## Archivos del Proyecto
+
+- `arduinoMega.ino` - Código principal del sistema
+- `README.md` - Documentación del proyecto
+- `.gitignore` - Exclusiones de Git
+- `codigopwm.ino` - Código PWM adicional
+- `arduinoMega_integrado.ino` - Versión integrada
+
+## Uso
+
+1. **Conexión del hardware** según el diagrama de pines
+2. **Carga del código** en Arduino Mega 2560
+3. **Configuración del IR2136** con alimentación adecuada
+4. **Ajuste de intensidad** con potenciómetro en A0
+5. **Control de secuencia** con switches en pines de interrupción
+
+## Monitor Serie
+
+El sistema proporciona información detallada por puerto serie:
+- Estado de inicialización
+- Secuencia binaria actual
+- Valores ADC y PWM en tiempo real
+- Debug de estados de motor
+
+```
+=== SISTEMA DE CONTROL MOTOR INICIADO ===
+NUEVA SECUENCIA BINARIA:
+Binario 1 -> Paso 1 (Motor: 000110)
+Binario 3 -> Paso 2 (Motor: 100100)
+...
+CONTROL PWM HABILITADO:
+- ADC A0 controla intensidad PWM de salidas altas
+```
+
+## Licencia
+
+Este proyecto está bajo licencia MIT - ver el archivo LICENSE para detalles. - Sistema de Interrupciones
 
 Este proyecto implementa un sistema de manejo de interrupciones por flancos de subida y bajada para tres entradas digitales en un Arduino Mega.
 
