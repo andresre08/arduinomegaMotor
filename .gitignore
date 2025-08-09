@@ -1,0 +1,45 @@
+# Arduino IDE files
+*.hex
+*.elf
+*.bin
+*.map
+*.sym
+*.lss
+*.eep
+
+# Compiled Object files
+*.o
+*.obj
+*.a
+*.lib
+
+# Build directories
+build/
+.build/
+
+# PlatformIO files (si usas PlatformIO en el futuro)
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# VS Code workspace settings
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
